@@ -14,7 +14,7 @@ create table timeB.Estudante
     idEstudante smallint identity not null,
     RA char(6) not null,
     email varchar(50) not null,
-    nomeSocial varchar(80) default null,
+    nomeSocial varchar(80) default '',
     semestreAtual tinyint default 1
         check (semestreAtual >= 1 and semestreAtual <= 10),
     diasAusente tinyint default 0
