@@ -1,15 +1,15 @@
-create schema timeB
+create schema timeB;
 
-create table timeB.Imovel as I
+create table timeB.Imovel
 (
     idImovel smallint identity,
     bloco char(1) not null,
     vagas tinyint default 4 not null
 
-    primary key (idImovel);
+    primary key (idImovel)
 );
 
-create table timeB.Estudante as E
+create table timeB.Estudante
 (
     idEstudante smallint identity not null,
     RA char(6) not null,
@@ -23,22 +23,22 @@ create table timeB.Estudante as E
 
     primary key (idEstudante),
     foreign key (idImovel)
-        references timeB.I (idImovel) 
+        references timeB.Imovel (idImovel) 
 );
 
-create table timeB.Apontamento as A
+create table timeB.Apontamento
 (
     idApontamento int identity not null,
-    RA char(6) not null,
+    idEstudante smallint not null,
     entrada datetime not null,
     saída datetime default null
 
     primary key (idApontamento),
     foreign key (idEstudante)
-        references timeB.E (idEstudante);
+        references timeB.Estudante (idEstudante)
 );
 
-create table timeB.Veiculo as V
+create table timeB.Veiculo
 (
     idVeiculo smallint identity not null,
     idEstudante smallint not null,
@@ -49,10 +49,10 @@ create table timeB.Veiculo as V
 
     primary key (idVeiculo),
     foreign key (idEstudante)
-        references timeB.E (idEstudante)
+        references timeB.Estudante (idEstudante)
 );
 
-create table timeB.Correspondencia as C
+create table timeB.Correspondencia
 (
     idCorrespondencia int identity not null,
     idEstudante smallint not null,
@@ -61,5 +61,5 @@ create table timeB.Correspondencia as C
 
     primary key (idCorrespondencia),
     foreign key (idEstudante)
-        references timeB.E (idEstudante)
+        references timeB.Estudante (idEstudante)
 );
