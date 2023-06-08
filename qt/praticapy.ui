@@ -163,7 +163,7 @@
       </widget>
       <widget class="QWidget" name="tabListagem">
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">border-radius: 5px</string>
        </property>
        <attribute name="icon">
         <iconset>
