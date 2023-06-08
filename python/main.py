@@ -12,7 +12,7 @@ def seletor():
     os.system('cls') or None
     while True:
         print("Operações disponíveis")
-        print("=" * 9, "=" * 9 + "\n")
+        print("=" * 9, "=" * 9 + "\n").
         print("0 - Sair")
         print("1 - Incluir estudante")
         print("2 - Alterar estudante")     
