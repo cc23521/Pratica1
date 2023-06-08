@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="botoes">
+    <file>cancelar.png</file>
+    <file>editar.png</file>
+    <file>inicio.png</file>
+    <file>anterior.png</file>
+    <file>proxima - Copia.png</file>
+    <file>adicionar.png</file>
+    <file>copiar.png</file>
+    <file>deletar.png</file>
+    <file>pesquisar.png</file>
+    <file>print.png</file>
+    <file>sair.png</file>
+    <file>salvar.png</file>
+  </qresource>
+</RCC>
