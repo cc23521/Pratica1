@@ -12,7 +12,7 @@ create table timeB.Imovel
 
 create table timeB.Estudante
 (
-    idEstudante smallint identity not null,
+    idEstudante smallint identity,
     RA char(6) not null,
     email varchar(50) not null,
     nomeSocial varchar(80) default '',
