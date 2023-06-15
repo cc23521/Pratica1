@@ -4,7 +4,8 @@ create table timeB.Imovel
 (
     idImovel smallint identity,
     bloco char(1) not null,
-    vagas tinyint default 4 not null
+    vagas tinyint default 4 
+	check (vagas >= 0 and vagas <= 4)
 
     primary key (idImovel)
 );
