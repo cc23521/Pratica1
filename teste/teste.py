@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -18,6 +18,10 @@ class Ui_MainWindow(object):
         #tabela apontamento
         self.tab_apontamento = QtWidgets.QWidget() 
         self.tab_apontamento.setObjectName("tab_apontamento")
+        
+        #tabela listagem
+        self.tab_listagem = QtWidgets.QWidget()
+        self.tab_listagem.setObjectName("tab_listagem")
         
         self.pushButton_insert_student = QtWidgets.QPushButton(self.tab_student)
         self.pushButton_insert_student.setGeometry(QtCore.QRect(50, 100, 150, 30))
@@ -52,6 +56,13 @@ class Ui_MainWindow(object):
         self.pushButton_delete_apontamento.setObjectName("pushButton_delete_apontamento")
         
         self.tabWidget.addTab(self.tab_apontamento, "")
+        
+        self.pushButton_listar = QtWidgets.QPushButton(self.tab_listagem)
+        self.pushButton_listar.setGeometry(QtCore.QRect(100, 100, 150, 30))
+        self.pushButton_listar.setObjectName("pushButton_listagem")
+        
+        self.tabWidget.addTab(self.tab_listagem, "")
+        
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -72,8 +83,10 @@ class Ui_MainWindow(object):
         self.pushButton_insert_apontamento.setText(_translate("MainWindow", "Insert Apontamento"))
         self.pushButton_delete_apontamento.setText(_translate("MainWindow", "Delete Apontamento"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_apontamento), _translate("Main Window", "Apontamento"))
-
-
+        
+        self.pushButton_listar.setText(_translate("MainWindow", "Listing"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_listagem), _translate("MainWindow", "Listagem"))
+        
 class Ui_InsertStudentWindow(object):
     def setupUi(self, InsertStudentWindow):
         InsertStudentWindow.setObjectName("InsertStudentWindow")
@@ -263,7 +276,6 @@ class Ui_InsertApontamentoWindow(object):
         self.label_entrada.setText(_translate("InsertApontamentoWindow", "Entry:"))
         self.label_saida.setText(_translate("InsertApontamentoWindow", "Exit:"))
 
-
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -275,6 +287,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.pushButton_delete_property.clicked.connect(self.delete_property)
         self.pushButton_insert_apontamento.clicked.connect(self.open_insert_apontamento_window)
         self.pushButton_delete_apontamento.clicked.connect(self.delete_apontamento)
+        self.pushButton_listar.clicked.connect(self.listagemTotal)
+
+    def listagemTotal(self):
+        idApontamento = self.ui.lineEdit_idApontamento.text()
+        ra = self.ui.lineEdit_RA.text()
+        entrada = self.ui.lineEdit_entrada.text()
+        saida = self.ui.lineEdit_saida.text()
+        name = self.ui.lineEdit_name.text()
+        email = self.ui.lineEdit_email.text()
+        property_id = self.ui.lineEdit_property_id.text()
+        absent_days = self.ui.label_absent_days.text()
+        idImovel = self.ui.lineEdit_Idimovel.text()
+        bloco = self.ui.lineEdit_bloco.text()
+        print("Name:", name)
+        print("RA:", ra)
+        print("Email:", email)
+        print("Property Id:", property_id)
+        print("Id Imovel:", idImovel)
+        print("Absent days:", absent_days)        
+        print("Bloco:", bloco)
+        print("ID Apontamento:", idApontamento)
+        print("Entrada:", entrada)
+        print("Saída:", saida)
 
     def open_insert_student_window(self):
         self.insert_student_window = QtWidgets.QMainWindow()
