@@ -182,3 +182,21 @@ if conectou():
     conexao.close()
 
 print("Programa encerrado.")
+
+# -- Criação da tabela "Imovel" no esquema "timeB"
+# INSERT INTO timeB.Imovel (bloco, vagas) VALUES ('A', 3);
+
+# -- Inserção de exemplo na tabela "Imovel"
+# INSERT INTO timeB.Imovel (bloco) VALUES ('A');
+
+# -- Inserção de exemplo na tabela "Estudante"
+# INSERT INTO timeB.Estudante (RA, email, nomeSocial, semestreAtual, diasAusente, idImovel) VALUES ('123456', 'exemplo@dominio.com', 'Nome Social', 2, 5, 1);
+
+# -- Inserção de exemplo na tabela "Apontamento"
+# INSERT INTO timeB.Apontamento (RA, entrada, saida) VALUES ('123456', '2023-06-19 09:00:00', '2023-06-19 18:00:00');
+
+# -- Inserção de exemplo na tabela "Veiculo"
+# INSERT INTO timeB.Veiculo (RA, placa, marca, modelo, cor) VALUES ('123456', 'ABC1234', 'Marca', 'Modelo', 'Vermelho');
+
+# -- Inserção de exemplo na tabela "Correspondencia"
+# INSERT INTO timeB.Correspondencia (RA, recebimento, retirada) VALUES ('123456', '2023-06-19 14:00:00', '2023-06-20 10:00:00');
