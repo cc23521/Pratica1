@@ -11,6 +11,8 @@ class Ui_MainWindow(object):
         self.tabWidget.setObjectName("tabWidget")
         self.tab_student = QtWidgets.QWidget()
         self.tab_student.setObjectName("tab_student")
+        self.tab_apontamento = QtWidgets.QWidget()
+        self.tab_apontamento.setObjectName("tab_apontamento")
         self.pushButton_insert_student = QtWidgets.QPushButton(self.tab_student)
         self.pushButton_insert_student.setGeometry(QtCore.QRect(50, 100, 150, 30))
         self.pushButton_insert_student.setObjectName("pushButton_insert_student")
@@ -27,6 +29,13 @@ class Ui_MainWindow(object):
         self.pushButton_delete_property.setGeometry(QtCore.QRect(200, 100, 150, 30))
         self.pushButton_delete_property.setObjectName("pushButton_delete_property")
         self.tabWidget.addTab(self.tab_property, "")
+        self.pushButton_insert_apontamento = QtWidgets.QPushButton(self.tab_apontamento)
+        self.pushButton_insert_apontamento.setGeometry(QtCore.QRect(50, 100, 150, 30))
+        self.pushButton_insert_apontamento.setObjectName("pushButton_insert_apontamento")
+        self.pushButton_delete_apontamento = QtWidgets.QPushButton(self.tab_apontamento)
+        self.pushButton_delete_apontamento.setGeometry(QtCore.QRect(200, 100, 150, 30))
+        self.pushButton_delete_apontamento.setObjectName("pushButton_delete_apontamento")
+        self.tabWidget.addTab(self.tab_apontamento, "")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -42,6 +51,9 @@ class Ui_MainWindow(object):
         self.pushButton_insert_property.setText(_translate("MainWindow", "Insert Property"))
         self.pushButton_delete_property.setText(_translate("MainWindow", "Delete Property"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_property), _translate("MainWindow", "Imóvel"))
+        self.pushButton_insert_apontamento.setText(_translate("MainWindow", "Insert Apontamento"))
+        self.pushButton_delete_apontamento.setText(_translate("MainWindow", "Delete Apontamento"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_apontamento), _translate("Main Window", "Apontamento"))
 
 
 class Ui_InsertStudentWindow(object):
