@@ -60,6 +60,30 @@ def incluir_apontamento():
             except:
                 print("Não foi possível incluir. Campos RA e Data de entrada são obrigatórios.")    
     meuCursor.commit()
+    
+def excluir_registro():
+    meuCursor = conexao.cursor()
+    ra = "12345"
+    while ra != "":
+        ra = input("RA (Enter para terminar): ")
+        if ra != "":
+            try:
+                meuCursor.execute("DELETE FROM timeB.Correspondencia WHERE RA = ?", ra)
+                meuCursor.execute("DELETE FROM timeB.Veiculo WHERE RA = ?", ra)
+                meuCursor.execute("DELETE FROM timeB.Apontamento WHERE RA = ?", ra)
+                meuCursor.execute("DELETE FROM timeB.Estudante WHERE RA = ?", ra)
+
+                meuCursor.execute("SELECT * FROM timeB.Estudante WHERE RA = ?", ra)
+                rows = meuCursor.fetchall()
+                for row in rows:
+                    print(row)
+
+                conexao.commit()
+
+                print("Registros excluídos com sucesso!")
+
+            except bd.Error as ex:
+                print("Ocorreu um erro ao excluir os registros:", ex)
 
 # def alterar():
 #     # cursor é um objeto que permite que nosso programa execute comandos
@@ -187,11 +211,13 @@ def seletor():
         print("1 - Incluir Imóvel")
         print("2 - Incluir Estudante")     
         print("3 - Incluir Apontamento")
+        print("4 - Excluir Registro")
         opcao = int(input("\nDigite o número da opção desejada: "))
         match opcao:
             case 1: incluir_imovel()
             case 2: incluir_estudante()
             case 3: incluir_apontamento()
+            case 4: excluir_registro()
 
 if conectou():
     seletor()
