@@ -84,6 +84,30 @@ def excluir_registro():
 
             except bd.Error as ex:
                 print("Ocorreu um erro ao excluir os registros:", ex)
+                
+def alterar_registro():
+    meuCursor = conexao.cursor()
+    ra = "12345"
+    while ra != "":
+        ra = input("RA (Enter para terminar): ")
+        if ra != "":
+            novo_nome = input("Novo nome: ")
+            novo_email = input("Novo email: ")
+            try:
+                meuCursor.execute("UPDATE timeB.Estudante SET email = ?, nome = ? WHERE RA = ?",
+                                  (novo_email, novo_nome, ra))
+                conexao.commit()
+
+                meuCursor.execute("SELECT * FROM timeB.Estudante WHERE RA = ?", ra)
+                rows = meuCursor.fetchall()
+                for row in rows:
+                    print(row)
+
+                print("Registro alterado com sucesso!")
+
+            except bd.Error as ex:
+                print("Ocorreu um erro ao alterar o registro:", ex)
+
 
 # def alterar():
 #     # cursor é um objeto que permite que nosso programa execute comandos
@@ -212,12 +236,14 @@ def seletor():
         print("2 - Incluir Estudante")     
         print("3 - Incluir Apontamento")
         print("4 - Excluir Registro")
+        print("5 - Alterar Registro")
         opcao = int(input("\nDigite o número da opção desejada: "))
         match opcao:
             case 1: incluir_imovel()
             case 2: incluir_estudante()
             case 3: incluir_apontamento()
             case 4: excluir_registro()
+            case 5: alterar_registro()
 
 if conectou():
     seletor()
