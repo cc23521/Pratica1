@@ -23,7 +23,7 @@ def incluir_imovel():
     meuCursor = conexao.cursor()
     bloco = "foo"
     while bloco != '':
-        bloco = input("Bloco [A-Z] (Enter para terminar): ")
+        bloco = input("Bloco [A-Z] (Enter para terminar): ").upper()
 
         if bloco == '': continue
 
@@ -34,7 +34,6 @@ def incluir_imovel():
         sComando = "insert into timeB.Imovel (bloco) values (?)"
         try:
             meuCursor.execute(sComando, bloco)
-            print("Imóvel incluído.")
         except bd.Error as err:
             print("Não foi possível incluir imóvel:", err)    
     meuCursor.commit()        
@@ -128,7 +127,6 @@ def excluir_estudante():
         try:
             meuCursor.execute("delete from timeB.Apontamento where RA = ?", ra)
             meuCursor.execute("delete from timeB.Estudante where RA = ?", ra)
-            print("Registros de estudante excluídos com sucesso!")
         except bd.Error as err:
             print("Ocorreu um erro ao excluir os registros:", err)
     meuCursor.commit()   
@@ -230,7 +228,6 @@ def excluir_apontamento():
     
         try:
             meuCursor.execute("delete from timeB.Apontamento where idApontamento = ?", idApontamento)
-            print("Registro de apontamento excluído com sucesso!")
         except bd.Error as err:
             print("Ocorreu um erro ao excluir os registros:", err)
     meuCursor.commit()
@@ -267,27 +264,6 @@ def excluir_registro():
         match opcao:
             case '1': excluir_estudante()
             case '2': excluir_apontamento()
-    meuCursor = conexao.cursor()
-    ra = "12345"
-    while ra != '':
-        ra = input("RA (Enter para terminar): ")
-        if ra != '':
-            novo_nome = input("Novo nome: ")
-            novo_email = input("Novo email: ")
-            try:
-                meuCursor.execute("update timeB.Estudante set email = ?, nome = ? where RA = ?",
-                                  (novo_email, novo_nome, ra))
-                conexao.commit()
-
-                meuCursor.execute("select * from timeB.Estudante where RA = ?", ra)
-                rows = meuCursor.fetchall()
-                for row in rows:
-                    print(row)
-
-                print("Registro alterado com sucesso!")
-
-            except bd.Error as err:
-                print("Ocorreu um erro ao alterar o registro:", err)
 
 def listar_registro():
     opcao = '1'
@@ -305,7 +281,7 @@ def listar_registro():
             case '2': listar_estudante()
             case '3': listar_apontamento()
             
-def atualizar_estudantes():
+def atualizar_estudante():
     meuCursor = conexao.cursor()
     ra = "foo"
     while ra != '':
@@ -313,23 +289,17 @@ def atualizar_estudantes():
 
         if ra == '': continue
 
-        novo_nome = input("Novo nome: ")
-        novo_email = input("Novo email: ")
+        nomeSocial = input("Novo nome social: ")
+        email = input("Novo email: ")
+        diasAusente = input("Dias ausente: ")
+        semestreAtual = input("Semestre atual: ")
         try:
-            meuCursor.execute("UPDATE timeB.Estudante SET email = ?, nomeSocial = ? WHERE RA = ?",
-                              (novo_email, novo_nome, ra))
+            meuCursor.execute("update timeB.Estudante set email = ?, nomeSocial = ?, diasAusente = ?, semestreAtual = ? where RA = ?",
+                              (email, nomeSocial, diasAusente, semestreAtual, ra))
             conexao.commit()
-
-            meuCursor.execute("SELECT * FROM timeB.Estudante WHERE RA = ?", ra)
-            estudantes = meuCursor.fetchall()
-            for estudante in estudantes:
-                print(estudante)
-
-            print("Registro alterado com sucesso!")
-
         except bd.Error as err:
-            print("Ocorreu um erro ao alterar o registro:", err)
-            
+            print("Ocorreu um erro ao alterar o registro:", err)          
+
 def atualizar_apontamento():
     meuCursor = conexao.cursor()
     idApontamento = "foo"
@@ -338,22 +308,27 @@ def atualizar_apontamento():
 
         if idApontamento == '': continue
 
-        nova_saida = input("Nova data de saída: ")
-        sComando = "UPDATE timeB.Apontamento SET saida = convert(date, ?, 103) WHERE idApontamento = ?"
+        saida = input("Nova data de saída: ")
+        sComando = "update timeB.Apontamento set saida = convert(date, ?, 103) where idApontamento = ?"
         try:
-            meuCursor.execute(sComando, nova_saida, idApontamento)
+            meuCursor.execute(sComando, saida, idApontamento)
             conexao.commit()
-
-            meuCursor.execute("SELECT * FROM timeB.Apontamento WHERE idApontamento = ?", idApontamento)
-            apontamentos = meuCursor.fetchall()
-            for apontamento in apontamentos:
-                print(apontamento)
-
-            print("Registro alterado com sucesso!")
-
         except bd.Error as err:
             print("Ocorreu um erro ao alterar o registro:", err)
 
+def atualizar_registro():
+    opcao = '1'
+    while opcao not in ('0', ''):
+        os.system("cls")
+        print("Operações disponíveis")
+        print("=" * 9, "=" * 11, "\n")
+        print("0 - Voltar")
+        print("1 - Atualizar Estudante")
+        print("2 - Atualizar Apontamento")
+        opcao = input("\nOpção desejada: ")
+        match opcao:
+            case '1': atualizar_estudante()
+            case '2': atualizar_apontamento()
 
 def seletor():
     opcao = '1'
@@ -364,16 +339,15 @@ def seletor():
         print("0 - Sair")
         print("1 - Incluir Registro")
         print("2 - Excluir Registro")
-        print("3 - Listar Registro")
-        print("4 - Atualizar Estudantes")
-        print("5 - Atualizar Apontamento")
+        print("3 - Atualizar Registro")
+        print("4 - Listar Registro")
         opcao = input("\nOpção desejada: ")
         match opcao:
             case '1': incluir_registro()
             case '2': excluir_registro()
-            case '3': listar_registro()
-            case '4': atualizar_estudantes()
-            case '5': atualizar_apontamento()
+            case '3': atualizar_registro()
+            case '4': listar_registro()
+
 if conectou():
     seletor()
     conexao.close()
