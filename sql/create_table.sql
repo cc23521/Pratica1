@@ -31,7 +31,7 @@ create table timeB.Apontamento
     idApontamento int identity,
     RA char(6) not null,
     entrada datetime not null,
-    saída datetime default null
+    saida datetime default null
 
     primary key (idApontamento),
     foreign key (RA)

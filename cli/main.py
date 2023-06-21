@@ -11,12 +11,9 @@ def conectou():
     try:
         conexao = bd.connect(driver="{SQL Server}",
                             server="regulus.cotuca.unicamp.br",
-                            database="BD23521",
-                            uid="BD23521",
+                            database=f"{banco_dados}",
+                            uid=f"{user}",
                             pwd=f"{senha}")
-                            # database=f"{banco_dados}",
-                            # uid=f"{user}",
-                            # pwd=f"{senha}") 
         return True
     except bd.Error as err:
         print("Não foi possível conectar ao servidor de BD:", err)
@@ -129,8 +126,8 @@ def excluir_estudante():
         if ra == '': continue
     
         try:
-            meuCursor.execute("DELETE FROM timeB.Apontamento WHERE RA = ?", ra)
-            meuCursor.execute("DELETE FROM timeB.Estudante WHERE RA = ?", ra)
+            meuCursor.execute("delete from timeB.Apontamento where RA = ?", ra)
+            meuCursor.execute("delete from timeB.Estudante where RA = ?", ra)
             print("Registros de estudante excluídos com sucesso!")
         except bd.Error as err:
             print("Ocorreu um erro ao excluir os registros:", err)
@@ -232,7 +229,7 @@ def excluir_apontamento():
         if idApontamento == '': continue
     
         try:
-            meuCursor.execute("DELETE FROM timeB.Apontamento WHERE idApontamento = ?", idApontamento)
+            meuCursor.execute("delete from timeB.Apontamento where idApontamento = ?", idApontamento)
             print("Registro de apontamento excluído com sucesso!")
         except bd.Error as err:
             print("Ocorreu um erro ao excluir os registros:", err)
@@ -278,11 +275,11 @@ def excluir_registro():
             novo_nome = input("Novo nome: ")
             novo_email = input("Novo email: ")
             try:
-                meuCursor.execute("UPDATE timeB.Estudante SET email = ?, nome = ? WHERE RA = ?",
+                meuCursor.execute("update timeB.Estudante set email = ?, nome = ? where RA = ?",
                                   (novo_email, novo_nome, ra))
                 conexao.commit()
 
-                meuCursor.execute("SELECT * FROM timeB.Estudante WHERE RA = ?", ra)
+                meuCursor.execute("select * from timeB.Estudante where RA = ?", ra)
                 rows = meuCursor.fetchall()
                 for row in rows:
                     print(row)
@@ -319,7 +316,7 @@ def atualizar_estudantes():
         novo_nome = input("Novo nome: ")
         novo_email = input("Novo email: ")
         try:
-            meuCursor.execute("UPDATE timeB.Estudante SET email = ?, nome = ? WHERE RA = ?",
+            meuCursor.execute("UPDATE timeB.Estudante SET email = ?, nomeSocial = ? WHERE RA = ?",
                               (novo_email, novo_nome, ra))
             conexao.commit()
 
