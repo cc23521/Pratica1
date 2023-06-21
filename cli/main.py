@@ -307,6 +307,56 @@ def listar_registro():
             case '1': listar_imovel()
             case '2': listar_estudante()
             case '3': listar_apontamento()
+            
+def atualizar_estudantes():
+    meuCursor = conexao.cursor()
+    ra = "foo"
+    while ra != '':
+        ra = input("RA (Enter para terminar): ")
+
+        if ra == '': continue
+
+        novo_nome = input("Novo nome: ")
+        novo_email = input("Novo email: ")
+        try:
+            meuCursor.execute("UPDATE timeB.Estudante SET email = ?, nome = ? WHERE RA = ?",
+                              (novo_email, novo_nome, ra))
+            conexao.commit()
+
+            meuCursor.execute("SELECT * FROM timeB.Estudante WHERE RA = ?", ra)
+            estudantes = meuCursor.fetchall()
+            for estudante in estudantes:
+                print(estudante)
+
+            print("Registro alterado com sucesso!")
+
+        except bd.Error as err:
+            print("Ocorreu um erro ao alterar o registro:", err)
+            
+def atualizar_apontamento():
+    meuCursor = conexao.cursor()
+    idApontamento = "foo"
+    while idApontamento != '':
+        idApontamento = input("Id Apontamento (Enter para terminar): ")
+
+        if idApontamento == '': continue
+
+        nova_saida = input("Nova data de saída: ")
+        sComando = "UPDATE timeB.Apontamento SET saida = convert(date, ?, 103) WHERE idApontamento = ?"
+        try:
+            meuCursor.execute(sComando, nova_saida, idApontamento)
+            conexao.commit()
+
+            meuCursor.execute("SELECT * FROM timeB.Apontamento WHERE idApontamento = ?", idApontamento)
+            apontamentos = meuCursor.fetchall()
+            for apontamento in apontamentos:
+                print(apontamento)
+
+            print("Registro alterado com sucesso!")
+
+        except bd.Error as err:
+            print("Ocorreu um erro ao alterar o registro:", err)
+
 
 def seletor():
     opcao = '1'
@@ -318,12 +368,15 @@ def seletor():
         print("1 - Incluir Registro")
         print("2 - Excluir Registro")
         print("3 - Listar Registro")
+        print("4 - Atualizar Estudantes")
+        print("5 - Atualizar Apontamento")
         opcao = input("\nOpção desejada: ")
         match opcao:
             case '1': incluir_registro()
             case '2': excluir_registro()
             case '3': listar_registro()
-
+            case '4': atualizar_estudantes()
+            case '5': atualizar_apontamento()
 if conectou():
     seletor()
     conexao.close()
