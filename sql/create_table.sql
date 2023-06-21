@@ -16,9 +16,9 @@ create table timeB.Estudante
     email varchar(50) not null,
     nomeSocial varchar(80) default '',
     semestreAtual tinyint default 1
-        check (semestreAtual >= 1 and semestreAtual <= 10),
+        check (semestreAtual <= 10),
     diasAusente tinyint default 0
-        check (diasAusente > 0 and diasAusente <= 31),
+        check (diasAusente <= 31),
     idImovel smallint not null
 
     primary key (RA),
