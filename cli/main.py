@@ -4,93 +4,209 @@ import getpass as gp
 
 def conectou():
     global conexao
-    os.system('cls')
+    os.system("cls")
+    banco_dados = input("Banco de dados: ")
+    user = input("Usuário: ")
     senha = gp.getpass("Digite a senha do seu banco de dados: ")
     try:
         conexao = bd.connect(driver="{SQL Server}",
                             server="regulus.cotuca.unicamp.br",
                             database="BD23521",
                             uid="BD23521",
-                            pwd=f"{senha}") 
-        print("Conexão bem sucedida!")
+                            pwd=f"{senha}")
+                            # database=f"{banco_dados}",
+                            # uid=f"{user}",
+                            # pwd=f"{senha}") 
         return True
-    except:
-        print("Não foi possível conectar ao servidor de BD!")
+    except bd.Error as err:
+        print("Não foi possível conectar ao servidor de BD:", err)
         return False
-    
+
 def incluir_imovel():
     meuCursor = conexao.cursor()
     bloco = "foo"
-    while bloco != "":
-        bloco = input("Bloco (Enter para terminar): ")
-        if bloco != "":
-            sComando = "insert into timeB.Imovel (bloco) values (?)"
-            try:
-                meuCursor.execute(sComando, bloco)
-            except:
-                print("Não foi possível incluir. Bloco deve ser apenas UM caractere.")    
+    while bloco != '':
+        bloco = input("Bloco [A-Z] (Enter para terminar): ")
+
+        if bloco == '': continue
+
+        if not bloco.isalpha():
+            print("Bloco deve ser caractere.")
+            continue
+        
+        sComando = "insert into timeB.Imovel (bloco) values (?)"
+        try:
+            meuCursor.execute(sComando, bloco)
+            print("Imóvel incluído.")
+        except bd.Error as err:
+            print("Não foi possível incluir imóvel:", err)    
     meuCursor.commit()        
     
+def atualizar_vagas_imovel(idImovel):
+    meuCursor = conexao.cursor()
+    sComando = f"if (select vagas from timeB.Imovel where idImovel = ?) > 0" +\
+               f"begin update timeB.Imovel set vagas = vagas - 1 where idImovel = ? end"
+    try:
+        meuCursor.execute(sComando, idImovel, idImovel)
+    except bd.Error as err:
+        print("Não foi possível atualizar número de vagas:", err)
+
+def tem_vagas():
+    meuCursor = conexao.cursor()
+    try:
+        meuCursor.execute("select * from timeB.Imovel")
+        imoveis = meuCursor.fetchall()
+        for imovel in imoveis:
+            vagas = imovel[2]
+            if vagas > 0:
+                return True
+        return False
+    except bd.Error as err:
+        print(err)
+
+def listar_imoveis():
+    meuCursor = conexao.cursor()
+    try:
+        meuCursor.execute("select * from timeB.Imovel")
+
+        imoveis = meuCursor.fetchall()
+        print("idImovel,bloco,vagas")
+        for imovel in imoveis:
+            idImovel, bloco, vagas = imovel[0], imovel[1], imovel[2]
+            if vagas > 0:
+                print(idImovel, bloco, vagas, sep=",")
+    except bd.Error as err:
+        print("Não foi possível listar os imóveis:", err)
+
 def incluir_estudante():
     meuCursor = conexao.cursor()
-    ra = "12345"
-    while ra != "":
+    ra = "foo"
+    while ra != '':
+        listar_estudante()
+        print()
+        if not tem_vagas(): break
+
         ra = input("RA (Enter para terminar): ")
-        if ra != "":
-            email = input("Email: ")
-            nomeSocial = input("Nome social (Enter para pular): ")
-            idImovel = input("Id Imóvel: ")
-            sComando = "insert into timeB.Estudante (RA, email, nomeSocial, idImovel) values (?, ?, ?, ?)"
-            try:
-                meuCursor.execute(sComando, ra, email, nomeSocial, idImovel)
-            except:
-                print("Não foi possível incluir. Campos RA, Email e idImovel são obrigatórios.")    
+        
+        if ra == '': continue
+
+        email = input("Email: ")
+        nomeSocial = input("Nome social (Enter para pular): ")
+        print("\nImóveis disponíveis")
+        listar_imoveis()
+        idImovel = input("\nId Imóvel: ")
+        sComando = "insert into timeB.Estudante (RA, email, nomeSocial, idImovel) values (?, ?, ?, ?)"
+        try:
+            meuCursor.execute(sComando, ra, email, nomeSocial, idImovel)
+            atualizar_vagas_imovel(idImovel)
+        except bd.Error as err:
+            print("Não foi possível incluir estudante:", err)    
     meuCursor.commit()
+
+def listar_estudante():
+    meuCursor = conexao.cursor()
+    try:
+        meuCursor.execute("select * from timeB.Estudante")
+
+        estudantes = meuCursor.fetchall()
+        print("RA,email,nomeSocial,semestreAtual,diasAusente,idImovel")
+        for estudante in estudantes:
+            ra =            estudante[0]
+            email =         estudante[1]
+            nomeSocial =    estudante[2]
+            semestreAtual = estudante[3]
+            diasAusente =   estudante[4]
+            idImovel =      estudante[5]
+            print(ra, email, nomeSocial, semestreAtual, diasAusente, idImovel, sep=",")
+    except bd.Error as err:
+        print("Não foi possível listar os imóveis:", err)
 
 def incluir_apontamento():
     meuCursor = conexao.cursor()
-    ra = "12345"
-    while ra != "":
+    ra = "foo"
+    while ra != '':
         ra = input("RA (Enter para terminar): ")
-        if ra != "":
-            entrada = input("Data de entrada: ")
-            sComando = "insert into timeB.Apontamento (ra, entrada) values (?, ?)"
-            try:
-                meuCursor.execute(sComando, ra, entrada)
-            except:
-                print("Não foi possível incluir. Campos RA e Data de entrada são obrigatórios.")    
+
+        if ra == '': continue
+
+        entrada = input("Data de entrada: ")
+        sComando = "insert into timeB.Apontamento (ra, entrada) values (?, convert(date, ?, 103))"
+        try:
+            meuCursor.execute(sComando, ra, entrada)
+        except bd.Error as err:
+            print("Não foi possível incluir apontamento:", err)    
     meuCursor.commit()
     
-def excluir_registro():
+def incluir_registro():
+    opcao = 'foo'
+    while opcao not in ('0', ''):
+        os.system("cls")
+        print("Operações disponíveis")
+        print("=" * 9, "=" * 11, "\n")
+        print("0 - Voltar")
+        print("1 - Incluir Imóvel")
+        if tem_vagas(): 
+            print("2 - Incluir Estudante")
+        else: 
+            print("2 - Incluir Estudante (NÃO HÁ VAGAS)")
+        print("3 - Incluir Apontamento")
+        opcao = input("\nDigite o número da opção desejada: ")
+        match opcao:
+            case '1': incluir_imovel()
+            case '2': incluir_estudante()
+            case '3': incluir_apontamento()
+
+def excluir_estudante():
     meuCursor = conexao.cursor()
-    ra = "12345"
-    while ra != "":
+    ra = "foo"
+    while ra != '':
         ra = input("RA (Enter para terminar): ")
-        if ra != "":
-            try:
-                meuCursor.execute("DELETE FROM timeB.Correspondencia WHERE RA = ?", ra)
-                meuCursor.execute("DELETE FROM timeB.Veiculo WHERE RA = ?", ra)
-                meuCursor.execute("DELETE FROM timeB.Apontamento WHERE RA = ?", ra)
-                meuCursor.execute("DELETE FROM timeB.Estudante WHERE RA = ?", ra)
 
-                meuCursor.execute("SELECT * FROM timeB.Estudante WHERE RA = ?", ra)
-                rows = meuCursor.fetchall()
-                for row in rows:
-                    print(row)
+        if ra == '': continue
+    
+        try:
+            meuCursor.execute("DELETE FROM timeB.Apontamento WHERE RA = ?", ra)
+            meuCursor.execute("DELETE FROM timeB.Estudante WHERE RA = ?", ra)
+            print("Registros excluídos com sucesso!")
+        except bd.Error as err:
+            print("Ocorreu um erro ao excluir os registros:", err)
+    meuCursor.commit()    
 
-                conexao.commit()
+def excluir_imovel():
+    meuCursor = conexao.cursor()
+    idImovel = 'foo'
+    while idImovel not in ('0', ''):
+        idImovel = input("Id Imóvel (Enter para terminar): ")
 
-                print("Registros excluídos com sucesso!")
+        if idImovel in ('0', ''): continue
 
-            except bd.Error as ex:
-                print("Ocorreu um erro ao excluir os registros:", ex)
-                
+        try:
+            meuCursor.execute("delete from timeB.Imovel where idImovel = ?", idImovel)
+            print("Registros excluídos com sucesso!")
+        except bd.Error as err:
+            print("Ocorre um erro ao excluir o registro:", err)
+    meuCursor.commit()
+
+def excluir_registro():
+    opcao = '1'
+    while opcao not in ('0', ''):
+        os.system("cls")
+        print("Operações disponíveis")
+        print("=" * 9, "=" * 11, "\n")
+        print("0 - Voltar")
+        print("1 - Excluir Estudante")
+        print("2 - Excluir Imóvel")
+        opcao = input("\nDigite o número da opção desejada: ")
+        match opcao:
+            case '1': excluir_estudante()
+            case '2': excluir_imovel()
+
 def alterar_registro():
     meuCursor = conexao.cursor()
     ra = "12345"
-    while ra != "":
+    while ra != '':
         ra = input("RA (Enter para terminar): ")
-        if ra != "":
+        if ra != '':
             novo_nome = input("Novo nome: ")
             novo_email = input("Novo email: ")
             try:
@@ -105,145 +221,26 @@ def alterar_registro():
 
                 print("Registro alterado com sucesso!")
 
-            except bd.Error as ex:
-                print("Ocorreu um erro ao alterar o registro:", ex)
+            except bd.Error as err:
+                print("Ocorreu um erro ao alterar o registro:", err)
 
-
-# def alterar():
-#     # cursor é um objeto que permite que nosso programa execute comandos
-#     # de SQL lá no servidor remoto:
-#     meuCursor = conexao.cursor()  # objeto de manipulação de dados
-#     numDepto = 1
-#     while numDepto != 0:
-#         # pedimos que o usuário digite o número do departamento a ser alterado
-#         numDepto = int(input("Número do departamento (0 para terminar): "))
-#         if numDepto != 0:    # usuário não quer terminar o cadastro
-#             # verifica no BD se existe um departamento com esse número digitado
-#             result = meuCursor.execute(
-#                     'SELECT NOMEDEPTO, GERENTE_NUMSEGSOCIAL, GERENTE_DATAINICIAL '+\
-#                     ' FROM EMPRESA.DEPARTAMENTO '+\
-#                     ' WHERE NUMDEPTO = ?', numDepto)
-#             registros = result.fetchall()
-#             if len(registros) == 0:
-#                 print("Departamento não encontrado.")
-#             else:
-#                 print("Registro encontrado:")
-#                 print(registros)
-#                 nomeDepto = registros[0][0]
-#                 gerente = registros[0][1]
-#                 data = registros[0][2]
-#                 print("Nome do departamento: "+nomeDepto)
-#                 print("Gerente:"+gerente)
-#                 print("Data inicial:"+data)
-                
-#                 nomeDepto = input("Novo nome do departamento ([Enter] para manter): ")
-#                 gerente = input("Novo gerente do departamento ([Enter] para manter:")
-#                 data = input("Nova data de início do gerente (dd/mm/aaaa) ([Enter] para manter: ")
-                
-#                 if nomeDepto == "":  # usuário digitou [Enter]
-#                      nomeDepto = registros[0][0]    # nome original do BD
-                     
-#                 if gerente == "":   # usuário digitou [Enter]
-#                     gerente = registros[0][1]   # gerente original do BD
-                    
-#                 if data == "":   # usuário digitou [Enter]
-#                     data = registros[0][2]  # data original do BD
-                        
-#             # criamos uma string com o comando Update para atualizar os novos dados
-#             sComando = "Update empresa.departamento " +\
-#                        "       set nomeDepto = ?, gerente_numSegSocial = ?,"+\
-#                        "           gerente_dataInicial = ? "+\
-#                        " where numDepto = ? "
-               
-#             # fazemos o cursor executar a string com o comando Update que criamos
-#             try:        # tente executar o comando abaixo:
-#                 meuCursor.execute(sComando, nomeDepto, gerente, data, numDepto)
-#             except:     # em caso de erro
-#                 print("Não foi possível alterar. Verifique.")
-    
-#     # após digitar numDepto = 0, paramos o cadastramento
-#     # e enviamos os registros alterados para serem definitivamente
-#     # gravados no servidor de banco de dados remoto
-#     meuCursor.commit() # enviar as mudanças para o BD   
-    
-# def excluir():
-#     # cursor é um objeto que permite que nosso programa execute comandos
-#     # de SQL lá no servidor remoto:
-#     meuCursor = conexao.cursor()  # objeto de manipulação de dados
-#     numDepto = 1
-#     while numDepto != 0:
-#         # pedimos que o usuário digite o número do departamento a ser excluído
-#         numDepto = int(input("Número do departamento (0 para terminar): "))
-#         if numDepto != 0:    # usuário não quer terminar o cadastro
-#             # verifica no BD se existe um departamento com esse número digitado
-#             result = meuCursor.execute(
-#                     'SELECT NOMEDEPTO, GERENTE_NUMSEGSOCIAL, GERENTE_DATAINICIAL '+\
-#                     ' FROM EMPRESA.DEPARTAMENTO '+\
-#                     ' WHERE NUMDEPTO = ?', numDepto)
-#             registros = result.fetchall()
-#             if len(registros) == 0:
-#                 print("Departamento não encontrado.")
-#             else:
-#                 print("Registro encontrado:")
-#                 nomeDepto = registros[0][0]
-#                 gerente = str(registros[0][1])
-#                 data = registros[0][2]
-#                 print("Nome do departamento: "+nomeDepto)
-#                 print("Gerente:"+gerente)
-#                 print("Data inicial:"+data)
-                
-#                 resposta = input("Deseja realmente excluir (s/n)?")
-#                 if resposta == "s":
-#                     # criamos uma string com o comando Delete para excluir o registro lido
-#                     sComando = "Delete from empresa.departamento " +\
-#                             " where numDepto = ? "
-                    
-#                     # fazemos o cursor executar a string com o comando Update que criamos
-#                     try:        # tente executar o comando abaixo:
-#                         meuCursor.execute(sComando, numDepto)
-#                     except:     # em caso de erro
-#                         print("Não foi possível excluir. Deve ser um departamento em uso.")
-    
-#     # após digitar numDepto = 0, paramos o cadastramento
-#     # e enviamos os registros inseridos para serem definitivamente
-#     # gravados no servidor de banco de dados remoto
-#     meuCursor.commit() # enviar as mudanças para o BD   
-
-# def listar():
-#     # cursor é um objeto que permite que nosso programa execute comandos
-#     # de SQL lá no servidor remoto:
-#     meuCursor = conexao.cursor()  # objeto de manipulação de dados
-#     # busca no BD os registros de departamentos 
-#     result = meuCursor.execute(
-#                 'SELECT numdepto, NOMEDEPTO, GERENTE_NUMSEGSOCIAL, GERENTE_DATAINICIAL '+\
-#                 ' FROM EMPRESA.DEPARTAMENTO ')   
-#     registros = result.fetchall()
-#     print(registros)
-#     print("Num. Nome       Gerente    Data Inicial")
-#     for depto in registros:
-#         print(f"{depto[0]}   {depto[1]}    {depto[2]}    {depto[3]}")
-        
-#     input("Tecle [enter] para terminar:")
-    
 def seletor():
-    opcao = 1
-    while opcao != 0:
-        os.system('cls') or None
+    opcao = '1'
+    while opcao not in ('0', ''):
+        os.system("cls")
         print("Operações disponíveis")
-        print("=" * 9, "=" * 9, "\n")
-        print("0 - Terminar este programa")
-        print("1 - Incluir Imóvel")
-        print("2 - Incluir Estudante")     
-        print("3 - Incluir Apontamento")
-        print("4 - Excluir Registro")
-        print("5 - Alterar Registro")
-        opcao = int(input("\nDigite o número da opção desejada: "))
+        print("=" * 9, "=" * 11, "\n")
+        print("0 - Sair")
+        print("1 - Incluir Registro")
+        print("2 - Excluir Registro")
+        print("3 - Alterar Registro")
+        print("4 - Listar Registro")
+        opcao = input("\nOpção desejada: ")
         match opcao:
-            case 1: incluir_imovel()
-            case 2: incluir_estudante()
-            case 3: incluir_apontamento()
-            case 4: excluir_registro()
-            case 5: alterar_registro()
+            case '1': incluir_registro()
+            case '2': excluir_registro()
+            # case 3: alterar_registro()
+            # case 4: listar_registro()
 
 if conectou():
     seletor()
