@@ -37,29 +37,3 @@ create table timeB.Apontamento
     foreign key (RA)
         references timeB.Estudante (RA)
 );
-
-create table timeB.Veiculo
-(
-    idVeiculo smallint identity,
-    RA char(6) not null,
-    placa char(7) not null,
-    marca varchar(10) not null,
-    modelo varchar(10) not null,
-    cor varchar(10) not null
-
-    primary key (idVeiculo),
-    foreign key (RA)
-        references timeB.Estudante (RA)
-);
-
-create table timeB.Correspondencia
-(
-    idCorrespondencia int identity,
-    RA char(6) not null,
-    recebimento datetime not null,
-    retirada datetime default null
-
-    primary key (idCorrespondencia),
-    foreign key (RA)
-        references timeB.Estudante (RA)
-);
